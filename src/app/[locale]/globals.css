@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0a1f44;
+  --coffee-blue: #1a3a8f;
+  --coffee-blue-dark: #0f2557;
+  --coffee-blue-light: #2d5bd4;
+  --coffee-cream: #f8f9ff;
+  --coffee-ink: #0a1f44;
+  --brutal-shadow: 4px 4px 0 0 var(--coffee-blue);
+  --brutal-shadow-sm: 2px 2px 0 0 var(--coffee-blue);
+  --brutal-shadow-lg: 6px 6px 0 0 var(--coffee-blue);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-coffee-blue: var(--coffee-blue);
+  --color-coffee-blue-dark: var(--coffee-blue-dark);
+  --color-coffee-blue-light: var(--coffee-blue-light);
+  --color-coffee-cream: var(--coffee-cream);
+  --color-coffee-ink: var(--coffee-ink);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+@utility shadow-brutal {
+  box-shadow: var(--brutal-shadow);
+}
+
+@utility shadow-brutal-sm {
+  box-shadow: var(--brutal-shadow-sm);
+}
+
+@utility shadow-brutal-lg {
+  box-shadow: var(--brutal-shadow-lg);
+}
+
+@utility border-brutal {
+  border-width: 4px;
+  border-style: solid;
+  border-color: var(--coffee-blue);
+}
+
+@utility text-stroke-blue {
+  -webkit-text-stroke: 2px var(--coffee-blue);
+  paint-order: stroke fill;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  overflow-x: clip;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+:focus-visible {
+  outline: 3px solid var(--coffee-blue);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::selection {
+  background: var(--coffee-blue);
+  color: white;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
