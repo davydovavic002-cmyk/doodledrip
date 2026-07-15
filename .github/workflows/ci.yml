@@ -20,15 +20,28 @@ jobs:
       - run: npm run test
       - run: npm run build
 
-      - name: Pack Linux .next
+      - name: Assemble standalone package
         if: github.event_name == 'push'
-        run: tar -czf doodledrip-next.tar.gz .next
+        run: |
+          set -euo pipefail
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+          test -f .next/standalone/server.js
+          du -sh .next .next/standalone
+          # Fail if package is suspiciously tiny (last broken artifact was ~4MB)
+          BYTES=$(du -sb .next/standalone | cut -f1)
+          echo "standalone bytes=$BYTES"
+          if [ "$BYTES" -lt 10000000 ]; then
+            echo "Standalone package too small — build looks incomplete"
+            exit 1
+          fi
+          tar -czf doodledrip-standalone.tar.gz -C .next/standalone .
+          ls -lh doodledrip-standalone.tar.gz
 
-      - name: Upload build artifact
+      - name: Upload standalone artifact
         if: github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
-          name: doodledrip-next-linux
-          path: doodledrip-next.tar.gz
+          name: doodledrip-standalone-linux
+          path: doodledrip-standalone.tar.gz
           retention-days: 14
-          compression-level: 0
