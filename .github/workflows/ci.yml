@@ -19,3 +19,16 @@ jobs:
       - run: npm run typecheck
       - run: npm run test
       - run: npm run build
+
+      - name: Pack Linux .next
+        if: github.event_name == 'push'
+        run: tar -czf doodledrip-next.tar.gz .next
+
+      - name: Upload build artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: doodledrip-next-linux
+          path: doodledrip-next.tar.gz
+          retention-days: 14
+          compression-level: 0
