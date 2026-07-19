@@ -102,7 +102,7 @@ export function MenuPageContent(): React.JSX.Element {
         </div>
 
         {hasSidebar ? (
-          <div className="order-first space-y-6 md:order-none md:sticky md:top-24 md:self-start lg:col-span-1">
+          <div className="space-y-6 md:sticky md:top-24 md:self-start lg:col-span-1">
             {detailVisible ? (
               <AnimatePresence mode="wait">
                 <motion.div

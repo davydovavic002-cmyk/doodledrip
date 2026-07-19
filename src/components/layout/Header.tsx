@@ -43,8 +43,12 @@ export function Header(): React.JSX.Element {
   }, [mobileOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b-4 border-coffee-blue bg-white pt-[env(safe-area-inset-top)]">
-      <div className="mx-auto grid h-14 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4 md:h-20 md:grid-cols-[auto_1fr_auto] md:px-6 lg:px-8">
+    <header
+      className={cn(
+        "z-50 border-b-4 border-coffee-blue bg-white pt-[env(safe-area-inset-top)]",
+        mobileOpen ? "fixed inset-x-0 top-0" : "sticky top-0",
+      )}
+    >      <div className="mx-auto grid h-14 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4 md:h-20 md:grid-cols-[auto_1fr_auto] md:px-6 lg:px-8">
         <LocaleLink
           href="/"
           className="group flex min-w-0 items-center gap-1.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-coffee-blue/30 sm:gap-2"
@@ -115,9 +119,10 @@ export function Header(): React.JSX.Element {
 
       {mobileOpen ? (
         <motion.nav
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t-2 border-coffee-blue bg-coffee-cream md:hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-x-0 bottom-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-40 overflow-y-auto border-t-2 border-coffee-blue bg-coffee-cream sm:top-[calc(4rem+env(safe-area-inset-top))] md:hidden"
           aria-label={t("a11y.navMobile")}
         >
           <ul className="flex flex-col p-3 sm:p-4">

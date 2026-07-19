@@ -32,7 +32,7 @@ export function LanguageSwitcher({
 
   return (
     <div
-      className={cn("inline-flex border-2 border-coffee-blue", className)}
+      className={cn("border-2 border-coffee-blue", className ?? "inline-flex")}
       role="group"
       aria-label={t("a11y.lang")}
     >

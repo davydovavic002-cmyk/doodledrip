@@ -26,16 +26,23 @@ export function ScratchReveal({ facts }: ScratchRevealProps): React.JSX.Element 
       if (!ctx) return;
 
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * 2;
-      canvas.height = rect.height * 2;
-      ctx.scale(2, 2);
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      // Reset any previous scale so redraws don't stack transforms / text.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, rect.width, rect.height);
 
       ctx.fillStyle = "#1a3a8f";
       ctx.fillRect(0, 0, rect.width, rect.height);
 
-      ctx.font = "bold 14px system-ui";
       ctx.fillStyle = "#ffffff";
       ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const fontSize = Math.max(14, Math.min(18, Math.floor(rect.width / 18)));
+      ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
       ctx.fillText(scratchHint, rect.width / 2, rect.height / 2);
     },
     [scratchHint],
@@ -52,10 +59,13 @@ export function ScratchReveal({ facts }: ScratchRevealProps): React.JSX.Element 
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
 
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalCompositeOperation = "destination-out";
       ctx.beginPath();
-      ctx.arc(x * scaleX, y * scaleY, 30, 0, Math.PI * 2);
+      ctx.arc(x * scaleX, y * scaleY, 30 * scaleX, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       let transparent = 0;
@@ -104,28 +114,25 @@ export function ScratchReveal({ facts }: ScratchRevealProps): React.JSX.Element 
   };
 
   useEffect(() => {
-    if (!revealed.has(activeIndex) && canvasRef.current) {
-      initCanvas(canvasRef.current);
-    }
+    if (revealed.has(activeIndex)) return;
+    const frame = requestAnimationFrame(() => initCanvas(canvasRef.current));
+    return () => cancelAnimationFrame(frame);
   }, [activeIndex, revealed, initCanvas, locale]);
 
   return (
     <div className="mx-auto max-w-lg">
-      {/* Fact selector dots */}
-      <div className="mb-4 flex justify-center gap-2" role="tablist" aria-label={t("a11y.funFacts")}>
+      <div
+        className="mb-4 flex justify-center gap-2"
+        role="tablist"
+        aria-label={t("a11y.funFacts")}
+      >
         {facts.map((fact, i) => (
           <button
             key={fact.id}
             type="button"
             role="tab"
             aria-selected={activeIndex === i}
-            onClick={() => {
-              setActiveIndex(i);
-              const canvas = canvasRef.current;
-              if (canvas && !revealed.has(i)) {
-                initCanvas(canvas);
-              }
-            }}
+            onClick={() => setActiveIndex(i)}
             className={`h-3 w-3 border-2 border-coffee-blue transition-colors ${
               activeIndex === i
                 ? "bg-coffee-blue"
@@ -144,23 +151,23 @@ export function ScratchReveal({ facts }: ScratchRevealProps): React.JSX.Element 
         animate={{ opacity: 1, scale: 1 }}
         className="relative aspect-[4/3] border-4 border-coffee-blue shadow-brutal"
       >
-        {/* Hidden fact underneath */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-coffee-cream p-8 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-coffee-cream p-6 text-center sm:p-8">
+          {revealed.has(activeIndex) ? (
+            <span className="rounded-sm bg-coffee-blue px-2.5 py-1 font-display text-[10px] font-bold uppercase tracking-widest text-white">
+              {t("about.scratch.done")}
+            </span>
+          ) : null}
           <span className="text-5xl" aria-hidden="true">
             {activeFact.emoji}
           </span>
-          <p className="mt-4 font-display text-lg font-bold leading-relaxed text-coffee-ink">
+          <p className="font-display text-base font-bold leading-snug text-coffee-ink sm:text-lg sm:leading-relaxed">
             {l(activeFact.fact)}
           </p>
         </div>
 
-        {/* Scratch canvas overlay */}
         {!revealed.has(activeIndex) ? (
           <canvas
-            ref={(el) => {
-              canvasRef.current = el;
-              initCanvas(el);
-            }}
+            ref={canvasRef}
             className="absolute inset-0 h-full w-full cursor-crosshair touch-none"
             onMouseDown={handleStart}
             onMouseMove={handleMove}
@@ -171,17 +178,7 @@ export function ScratchReveal({ facts }: ScratchRevealProps): React.JSX.Element 
             onTouchEnd={handleEnd}
             aria-label={scratchHint}
           />
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 flex items-center justify-center bg-coffee-blue/10"
-          >
-            <span className="font-display text-sm font-bold uppercase tracking-widest text-coffee-blue">
-              {t("about.scratch.done")}
-            </span>
-          </motion.div>
-        )}
+        ) : null}
       </motion.div>
     </div>
   );
