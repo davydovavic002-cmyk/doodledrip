@@ -73,13 +73,13 @@ export function Hero(): React.JSX.Element {
       />
 
       <motion.div
-        className="pointer-events-none absolute -left-20 top-20 h-40 w-40 border-4 border-coffee-blue bg-coffee-cream"
+        className="pointer-events-none absolute -left-20 top-20 hidden h-40 w-40 border-4 border-coffee-blue bg-coffee-cream md:block"
         animate={{ rotate: [0, 5, 0], y: [0, -10, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         aria-hidden="true"
       />
       <motion.div
-        className="pointer-events-none absolute -right-10 bottom-32 h-24 w-24 rounded-full border-4 border-coffee-blue"
+        className="pointer-events-none absolute -right-10 bottom-32 hidden h-24 w-24 rounded-full border-4 border-coffee-blue md:block"
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         aria-hidden="true"
